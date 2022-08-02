@@ -86,8 +86,25 @@ class NewOrderPage extends Component {
 	handleLogOut = () => {
 		this.setState({ name: '' });
 	};
-	handleCheckOut = () => {
-		this.setState({ isPaid: true });
+	// handleCheckOut = () => {
+	// 	this.setState({ isPaid: true });
+	// };
+
+	handleCheckOut = async () => {
+		try {
+			let fetchResponse = await fetch('/api/orders', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ lineItems: this.state.lineItems }),
+			}); /** <-- send this object to server*/
+			let serverResponse =
+				await fetchResponse.json(); /** <-- decode fetch response*/
+			console.log('Success', serverResponse); /** <-- log server response*/
+			// if the orderwas sent over without errors, set state to empty
+			this.setState({ lineItems: [] });
+		} catch (err) {
+			console.log('Error:', err); /** <-- log if error*/
+		}
 	};
 	handleAddToCart = (item) => {
 		// add item to cart === lineItems
@@ -131,7 +148,7 @@ class NewOrderPage extends Component {
 						ORDER HISTORY
 					</Link>
 					<UserLogOut
-            {...this.props}
+						{...this.props}
 						name={this.state.name}
 						email={this.state.email}
 						handleLogOut={this.handleLogOut}
